@@ -17,7 +17,7 @@ export function FeatureItem({
       <div className={twMerge('rounded-full p-2', iconBgColor)}>
         <Icon className="fill-white" size={16} weight="fill" />
       </div>
-      <span className="text-sm text-zinc-700">{text}</span>
+      <span className="text-base-text text-sm">{text}</span>
     </div>
   )
 }

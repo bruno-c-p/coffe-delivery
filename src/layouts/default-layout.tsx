@@ -3,9 +3,11 @@ import { Header } from '../components/header'
 
 export function DefaultLayout() {
   return (
-    <div className="min-h-dvh bg-zinc-50">
+    <div className="min-h-dvh bg-background">
       <Header />
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
     </div>
   )
 }
