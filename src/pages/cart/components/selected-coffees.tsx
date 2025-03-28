@@ -1,29 +1,12 @@
+import { useFormContext } from 'react-hook-form'
+import { useCartContext } from '../../../hooks/useCartContext'
 import { CartItem } from './cart-item'
 
-interface SelectedCoffeesProps {
-  items: Array<{
-    id: string
-    name: string
-    price: number
-    quantity: number
-    imageUrl: string
-  }>
-  onIncrementItem: (itemId: string) => void
-  onDecrementItem: (itemId: string) => void
-  onRemoveItem: (itemId: string) => void
-}
-
-export function SelectedCoffees({
-  items,
-  onIncrementItem,
-  onDecrementItem,
-  onRemoveItem,
-}: SelectedCoffeesProps) {
-  const deliveryFee = 3.5
-  const itemsTotal = items.reduce((total, item) => {
-    return total + item.price * item.quantity
-  }, 0)
-  const total = itemsTotal + deliveryFee
+export function SelectedCoffees() {
+  const {
+    formState: { isValid, isDirty },
+  } = useFormContext()
+  const { cart, deliveryFee, itemsTotal, total } = useCartContext()
 
   return (
     <div className="flex flex-col gap-3">
@@ -33,14 +16,8 @@ export function SelectedCoffees({
 
       <div className="rounded-md rounded-tl-md rounded-tr-[36px] rounded-br-md rounded-bl-[36px] bg-base-card p-10">
         <div className="flex flex-col gap-6">
-          {items.map(item => (
-            <CartItem
-              key={item.id}
-              {...item}
-              onIncrement={() => onIncrementItem(item.id)}
-              onDecrement={() => onDecrementItem(item.id)}
-              onRemove={() => onRemoveItem(item.id)}
-            />
+          {cart.map(item => (
+            <CartItem cartItem={item} key={item.coffee.id} />
           ))}
         </div>
 
@@ -79,7 +56,8 @@ export function SelectedCoffees({
         <button
           type="submit"
           form="checkout"
-          className="mt-6 w-full rounded-md bg-yellow py-3 font-bold text-sm text-white uppercase transition hover:bg-yellow-dark"
+          className="mt-6 w-full rounded-md bg-yellow py-3 font-bold text-sm text-white uppercase transition hover:bg-yellow-dark disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-yellow"
+          disabled={!isValid || !isDirty}
         >
           Confirmar pedido
         </button>

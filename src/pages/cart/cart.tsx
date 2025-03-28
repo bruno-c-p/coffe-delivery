@@ -1,89 +1,65 @@
-import { CreditCard, CurrencyDollar, MapPinLine } from '@phosphor-icons/react'
-import { useState } from 'react'
-import { FormGroup } from './components/form-group'
-import * as FormInput from './components/input'
-import { PaymentMethod } from './components/payment-method'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import { z } from 'zod'
+import { useCartContext } from '../../hooks/useCartContext'
+import CheckoutForm from './components/checkout-form'
 import { SelectedCoffees } from './components/selected-coffees'
 
+export const checkoutFormSchema = z.object({
+  cep: z.string().min(1),
+  street: z.string().min(1),
+  number: z.string().min(1),
+  complement: z.string().optional(),
+  neighborhood: z.string().min(1),
+  city: z.string().min(1),
+  uf: z.string().min(1),
+  paymentMethod: z.enum(['credit', 'debit', 'cash']),
+})
+
+export type CheckoutFormData = z.infer<typeof checkoutFormSchema>
+
 export function Cart() {
-  const [paymentMethod, setPaymentMethod] = useState<
-    'credit' | 'debit' | 'cash'
-  >()
+  const navigate = useNavigate()
+  const { clearCart } = useCartContext()
+  const checkoutForm = useForm<CheckoutFormData>({
+    resolver: zodResolver(checkoutFormSchema),
+    defaultValues: {
+      cep: '',
+      street: '',
+      number: '',
+      complement: '',
+      neighborhood: '',
+      city: '',
+      uf: '',
+      paymentMethod: 'credit',
+    },
+  })
+  const { handleSubmit, reset } = checkoutForm
+
+  function handleCheckout(data: CheckoutFormData) {
+    navigate('/order-success', { state: { data } })
+    reset()
+    clearCart()
+  }
 
   return (
     <div className="mx-auto my-10 grid max-w-[1440px] grid-cols-cart gap-12 px-40">
-      <div>
-        <h1 className="font-bold font-display text-base-subtitle text-lg">
-          Complete seu pedido
-        </h1>
-        <form id="checkout" className="mt-4 flex flex-col gap-8">
-          <FormGroup
-            icon={MapPinLine}
-            iconColor="text-yellow-dark"
-            title="Endereço de entrega"
-            description="Informe o endereço onde deseja receber seu pedido"
+      <FormProvider {...checkoutForm}>
+        <div>
+          <h1 className="font-bold font-display text-base-subtitle text-lg">
+            Complete seu pedido
+          </h1>
+          <form
+            id="checkout"
+            onSubmit={handleSubmit(handleCheckout)}
+            className="mt-4 flex flex-col gap-8"
           >
-            <div className="grid grid-cols-6 gap-4">
-              <FormInput.Root className="col-span-2">
-                <FormInput.Input placeholder="CEP" />
-              </FormInput.Root>
-              <FormInput.Root className="col-span-6">
-                <FormInput.Input placeholder="Rua" />
-              </FormInput.Root>
-              <FormInput.Root className="col-span-2">
-                <FormInput.Input placeholder="Número" />
-              </FormInput.Root>
-              <FormInput.Root className="col-span-4">
-                <FormInput.Input id="complement" placeholder="Complemento" />
-                <FormInput.Hint htmlFor="complement">Opcional</FormInput.Hint>
-              </FormInput.Root>
-              <FormInput.Root className="col-span-2">
-                <FormInput.Input placeholder="Bairro" />
-              </FormInput.Root>
-              <FormInput.Root className="col-span-3">
-                <FormInput.Input placeholder="Cidade" />
-              </FormInput.Root>
-              <FormInput.Root className="col-span-1">
-                <FormInput.Input placeholder="UF" />
-              </FormInput.Root>
-            </div>
-          </FormGroup>
-          <FormGroup
-            icon={CurrencyDollar}
-            iconColor="text-purple"
-            title="Pagamento"
-            description="O pagamento é feito na entrega. Escolha a forma que deseja pagar"
-          >
-            <PaymentMethod
-              selected={paymentMethod}
-              onSelect={method => setPaymentMethod(method)}
-            />
-          </FormGroup>
-        </form>
-      </div>
-      <div>
-        <SelectedCoffees
-          items={[
-            {
-              id: '1',
-              name: 'Expresso',
-              price: 10,
-              quantity: 1,
-              imageUrl: '/images/coffees/expresso.png',
-            },
-            {
-              id: '1',
-              name: 'Expresso',
-              price: 10,
-              quantity: 1,
-              imageUrl: '/images/coffees/expresso.png',
-            },
-          ]}
-          onIncrementItem={() => {}}
-          onDecrementItem={() => {}}
-          onRemoveItem={() => {}}
-        />
-      </div>
+            <CheckoutForm />
+          </form>
+        </div>
+        <SelectedCoffees />
+      </FormProvider>
     </div>
   )
 }

@@ -1,5 +1,11 @@
-import { Coffee, Package, ShoppingCart, Timer } from '@phosphor-icons/react'
+import {
+  Coffee as CoffeeIcon,
+  Package,
+  ShoppingCart,
+  Timer,
+} from '@phosphor-icons/react'
 import coffeeData from '../../assets/data.json'
+import type { Coffee } from '../../reducers/cart/reducer'
 import { CoffeeCard } from './components/coffee-card'
 import { FeatureItem } from './components/feature-item'
 
@@ -35,7 +41,7 @@ export function Home() {
                   iconBgColor="bg-yellow-500"
                 />
                 <FeatureItem
-                  icon={Coffee}
+                  icon={CoffeeIcon}
                   text="O café chega fresquinho até você"
                   iconBgColor="bg-violet-500"
                 />
@@ -55,8 +61,8 @@ export function Home() {
           Nossos cafés
         </h2>
         <div className="mt-14 grid grid-cols-4 gap-x-8 gap-y-10">
-          {coffeeData.coffees.map(coffee => (
-            <CoffeeCard key={coffee.id} {...coffee} />
+          {coffeeData.coffees.map((coffee: Coffee) => (
+            <CoffeeCard coffee={coffee} key={coffee.id} />
           ))}
         </div>
       </section>

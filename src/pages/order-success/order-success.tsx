@@ -1,22 +1,31 @@
 import { CurrencyDollar, MapPin, Timer } from '@phosphor-icons/react'
+import { useLocation } from 'react-router-dom'
+import type { CheckoutFormData } from '../cart/cart'
 
-interface OrderSuccessInfo {
-  street: string
-  district: string
-  city: string
-  state: string
-  paymentMethod: string
-  estimatedTime: string
+const paymentMethod = {
+  credit: 'Cartão de crédito',
+  debit: 'Cartão de débito',
+  cash: 'Dinheiro',
 }
 
 export function OrderSuccess() {
-  const orderInfo: OrderSuccessInfo = {
-    street: 'Rua João Daniel Martinelli, 102',
-    district: 'Farrapos',
-    city: 'Porto Alegre',
-    state: 'RS',
-    paymentMethod: 'Cartão de Crédito',
-    estimatedTime: '20 min - 30 min',
+  const location = useLocation()
+
+  if (!location.state) {
+    return (
+      <div className="mx-auto max-w-[1440px] px-40 py-20">
+        <h1 className="font-display font-extrabold text-3xl text-red-600">
+          Não encontrado.
+        </h1>
+        <p className="mt-1 text-base-subtitle text-xl">
+          O pedido não foi encontrado.
+        </p>
+      </div>
+    )
+  }
+
+  const { data: checkoutState } = location.state as {
+    data: CheckoutFormData
   }
 
   return (
@@ -33,17 +42,18 @@ export function OrderSuccess() {
       <div className="mt-10 flex items-start justify-between">
         <div className="relative rounded-tl-md rounded-tr-[36px] rounded-br-md rounded-bl-[36px] p-[1px]">
           <div className="absolute inset-0 rounded-tl-md rounded-tr-[36px] rounded-br-md rounded-bl-[36px] bg-gradient-to-r from-yellow-dark to-purple-dark" />
-          <div className="relative rounded-tl-md rounded-tr-[36px] rounded-br-md rounded-bl-[36px] bg-white p-10 text-base-text">
+          <div className="relative min-w-[526px] rounded-tl-md rounded-tr-[36px] rounded-br-md rounded-bl-[36px] bg-white p-10 text-base-text">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-purple p-2">
                 <MapPin className="text-white" weight="fill" size={16} />
               </div>
               <div>
                 <p>
-                  Entrega em <strong>{orderInfo.street}</strong>
+                  Entrega em <strong>{checkoutState.street}</strong>
                 </p>
                 <p>
-                  {orderInfo.district} - {orderInfo.city}, {orderInfo.state}
+                  {checkoutState.neighborhood} - {checkoutState.city},{' '}
+                  {checkoutState.uf}
                 </p>
               </div>
             </div>
@@ -54,7 +64,7 @@ export function OrderSuccess() {
               </div>
               <div>
                 <p>Previsão de entrega</p>
-                <strong>{orderInfo.estimatedTime}</strong>
+                <strong>20 min - 30 min</strong>
               </div>
             </div>
 
@@ -68,12 +78,11 @@ export function OrderSuccess() {
               </div>
               <div>
                 <p>Pagamento na entrega</p>
-                <strong>{orderInfo.paymentMethod}</strong>
+                <strong>{paymentMethod[checkoutState.paymentMethod]}</strong>
               </div>
             </div>
           </div>
         </div>
-
         <img
           src="/order-success.svg"
           alt="Entregador em uma moto roxa"

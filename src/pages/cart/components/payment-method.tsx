@@ -2,11 +2,14 @@ import { Bank, CreditCard, Money } from '@phosphor-icons/react'
 import * as Select from './select'
 
 interface PaymentMethodProps {
-  selected?: 'credit' | 'debit' | 'cash'
+  selected: 'credit' | 'debit' | 'cash'
   onSelect: (method: 'credit' | 'debit' | 'cash') => void
 }
 
-export function PaymentMethod({ selected, onSelect }: PaymentMethodProps) {
+export function PaymentMethod({
+  selected = 'credit',
+  onSelect,
+}: PaymentMethodProps) {
   return (
     <Select.Root>
       <Select.Option
